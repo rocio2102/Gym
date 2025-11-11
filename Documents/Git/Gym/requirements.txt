@@ -1,4 +1,4 @@
 streamlit
 pandas
-gspread # Nueva librería
-oauth2client # Nueva librería para gspread
+gspread
+oauth2client
