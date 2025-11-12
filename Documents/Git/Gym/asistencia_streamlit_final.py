@@ -190,17 +190,25 @@ else:
                                        max_value=fecha_max,
                                        key="filtro_fecha")
 
-    # Aplicar filtros
+   # Aplicar filtros
     df_filtrado = df_asistencias.copy()
     
-    if filtro_fecha:
-        df_filtrado = df_filtrado[df_filtrado['Fecha'].dt.date == filtro_fecha]
+    # PASO CLAVE 1: Crear la columna combinada y convertirla a minúsculas
+    df_filtrado['Nombre_Completo'] = (
+        df_filtrado['Nombre'].astype(str) + ' ' + df_filtrado['Apellido'].astype(str)
+    ).str.lower()
+    
+    # ... (Filtro por fecha si aplica) ...
 
     if filtro_texto:
+        # PASO CLAVE 2: Convertir el texto de búsqueda a minúsculas
+        texto_busqueda_lower = filtro_texto.lower()
+        
         df_filtrado = df_filtrado[
-            df_filtrado['Nombre'].str.contains(filtro_texto, case=False, na=False) |
-            df_filtrado['Apellido'].str.contains(filtro_texto, case=False, na=False)
+            df_filtrado['Nombre_Completo'].str.contains(texto_busqueda_lower, na=False)
         ]
+        
+    df_filtrado = df_filtrado.drop(columns=['Nombre_Completo'])
     
     # Mostrar totales
     col_total.metric(label="Total de Asistencias (Filtradas)", value=len(df_filtrado))
@@ -237,3 +245,4 @@ else:
                 st.button("SÍ, BORRAR DEFINITIVAMENTE", type="primary", on_click=ejecutar_limpieza_y_recargar)
             with col_confirm_no:
                 st.button("NO, CANCELAR", on_click=cancelar_limpieza)
+
